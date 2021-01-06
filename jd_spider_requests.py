@@ -325,7 +325,7 @@ class JdSeckill(object):
         self._seckill()
 
     @check_login
-    def seckill_by_proc_pool(self, work_count=5):
+    def seckill_by_proc_pool(self, work_count=2):
         """
         多进程进行抢购
         work_count：进程数量
@@ -383,7 +383,8 @@ class JdSeckill(object):
                 logger.info('预约成功，已获得抢购资格 / 您已成功预约过了，无需重复预约')
                 if global_config.getRaw('messenger', 'enable') == 'true':
                     success_message = "预约成功，已获得抢购资格 / 您已成功预约过了，无需重复预约"
-                    send_wechat(success_message)
+                    # 预约暂不需要微信通知
+                    # send_wechat(success_message)
                 break
             except Exception as e:
                 logger.error('预约失败正在重试...')
@@ -506,9 +507,11 @@ class JdSeckill(object):
             'Host': 'marathon.jd.com',
         }
         resp = self.session.post(url=url, data=data, headers=headers)
+        #logger.info("秒杀初始化信息.: " + json.dumps(resp))
 
         resp_json = None
         try:
+            #print(resp.text)
             resp_json = parse_json(resp.text)
         except Exception:
             raise SKException('抢购失败，返回信息:{}'.format(resp.text[0: 128]))
@@ -524,6 +527,7 @@ class JdSeckill(object):
         self.seckill_init_info[self.sku_id] = self._get_seckill_init_info()
         init_info = self.seckill_init_info.get(self.sku_id)
         default_address = init_info['addressList'][0]  # 默认地址dict
+        logger.info("默认地址dict: {}".format(json.dumps(default_address)))
         invoice_info = init_info.get('invoiceInfo', {})  # 默认发票信息dict, 有可能不返回
         token = init_info['token']
         data = {
@@ -561,7 +565,7 @@ class JdSeckill(object):
             'token': token,
             'pru': ''
         }
-
+        logger.info("提交抢购订单所需参数: {}".format(json.dumps(data)))
         return data
 
     def submit_seckill_order(self):

@@ -1,5 +1,7 @@
 import sys
 from jd_spider_requests import JdSeckill
+from jd_logger import logger
+import json
 
 
 if __name__ == '__main__':
@@ -19,6 +21,9 @@ if __name__ == '__main__':
  2.秒杀抢购商品
     """
     print(a)
+
+    JdSeckill().submit_seckill_order()
+    sys.exit(1)
 
     jd_seckill = JdSeckill()
     choice_function = input('请选择:')
