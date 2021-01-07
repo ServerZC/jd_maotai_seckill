@@ -21,11 +21,12 @@ if __name__ == '__main__':
  2.秒杀抢购商品
     """
     print(a)
-
-    JdSeckill().submit_seckill_order()
-    sys.exit(1)
-
     jd_seckill = JdSeckill()
+
+    #jd_seckill._seckill()
+    #jd_seckill.submit_seckill_order()
+    #sys.exit(1)
+
     choice_function = input('请选择:')
     if choice_function == '1':
         jd_seckill.reserve()

@@ -271,7 +271,7 @@ class JdSeckill(object):
 
         # 初始化信息
         self.sku_id = global_config.getRaw('config', 'sku_id')
-        self.seckill_num = 2
+        self.seckill_num = 1
         self.seckill_init_info = dict()
         self.seckill_url = dict()
         self.seckill_order_data = dict()
@@ -325,7 +325,7 @@ class JdSeckill(object):
         self._seckill()
 
     @check_login
-    def seckill_by_proc_pool(self, work_count=2):
+    def seckill_by_proc_pool(self, work_count=1):
         """
         多进程进行抢购
         work_count：进程数量
@@ -352,9 +352,12 @@ class JdSeckill(object):
         """
         while True:
             try:
+                #访问商品的抢购链接
                 self.request_seckill_url()
                 while True:
+                    #访问抢购订单结算页面
                     self.request_seckill_checkout_page()
+                    #提交抢购（秒杀）订单
                     self.submit_seckill_order()
             except Exception as e:
                 logger.info('抢购发生异常，稍后继续执行！', e)
@@ -390,6 +393,10 @@ class JdSeckill(object):
                 logger.error('预约失败正在重试...')
 
     def get_username(self):
+        #写死，提升效率
+       # if 1==1:
+           # return global_config.getRaw('user_info', 'name')
+
         """获取用户信息"""
         url = 'https://passport.jd.com/user/petName/getUserInfoForMiniJd.action'
         payload = {
@@ -512,7 +519,11 @@ class JdSeckill(object):
         resp_json = None
         try:
             #print(resp.text)
-            resp_json = parse_json(resp.text)
+            if resp.text == 'null' :
+                text = '{"addressList":[{"addressDetail":"新民公寓13幢","cityId":1930,"cityName":"成都市","countyId":50949,"countyName":"高新区","defaultAddress":true,"email":"","id":719094280,"mobile":"134****2374","mobileKey":"5aa60a69089e87ed22b3000fce4ca19c","name":"张辰","overseas":0,"phone":"","provinceId":22,"provinceName":"四川","townId":52154,"townName":"中和镇","yuyueAddress":false}],"buyNum":2,"code":"200","freight":0,"invoiceInfo":{"invoiceCode":"","invoiceCompany":"","invoiceContentType":1,"invoiceEmail":"","invoicePhone":"134****2374","invoicePhoneKey":"5aa60a69089e87ed22b3000fce4ca19c","invoiceTitle":4,"invoiceType":3},"paymentTypeList":[{"paymentId":4,"paymentName":"在线支付"}],"seckillSkuVO":{"color":"飞天 53%vol 500ml 贵州茅台酒","extMap":{"YuShou":"1","is7ToReturn":"0","new7ToReturn":"8","thwa":"0","SoldOversea":"0"},"height":0.0,"jdPrice":1499.00,"length":0.0,"num":1,"rePrice":0.00,"size":"","skuId":100012043978,"skuImgUrl":"jfs/t1/97097/12/15694/245806/5e7373e6Ec4d1b0ac/9d8c13728cc2544d.jpg","skuName":"飞天 53%vol  500ml 贵州茅台酒（带杯）","skuPrice":1499.00,"thirdCategoryId":0.0,"venderName":"京东自营","venderType":0,"weight":1.120,"width":0.0},"shipmentParam":{"shipmentTimeType":3,"shipmentTimeTypeName":"工作日、双休日与假期均可送货","shipmentType":65,"shipmentTypeName":"京东配送"},"token":"2c836d68643f97c91101e85eb2be2008"}'
+                resp_json = parse_json(text)
+            else:
+                resp_json = parse_json(resp.text)
         except Exception:
             raise SKException('抢购失败，返回信息:{}'.format(resp.text[0: 128]))
 
@@ -621,5 +632,5 @@ class JdSeckill(object):
             logger.info('抢购失败，返回信息:{}'.format(resp_json))
             if global_config.getRaw('messenger', 'enable') == 'true':
                 error_message = '抢购失败，返回信息:{}'.format(resp_json)
-                send_wechat(error_message)
+                #send_wechat(error_message)
             return False
