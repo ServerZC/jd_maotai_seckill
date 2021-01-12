@@ -325,7 +325,7 @@ class JdSeckill(object):
         self._seckill()
 
     @check_login
-    def seckill_by_proc_pool(self, work_count=1):
+    def seckill_by_proc_pool(self, work_count=4):
         """
         多进程进行抢购
         work_count：进程数量
@@ -538,7 +538,7 @@ class JdSeckill(object):
         self.seckill_init_info[self.sku_id] = self._get_seckill_init_info()
         init_info = self.seckill_init_info.get(self.sku_id)
         default_address = init_info['addressList'][0]  # 默认地址dict
-        logger.info("默认地址dict: {}".format(json.dumps(default_address)))
+        #logger.info("默认地址dict: {}".format(json.dumps(default_address)))
         invoice_info = init_info.get('invoiceInfo', {})  # 默认发票信息dict, 有可能不返回
         token = init_info['token']
         data = {
@@ -576,7 +576,7 @@ class JdSeckill(object):
             'token': token,
             'pru': ''
         }
-        logger.info("提交抢购订单所需参数: {}".format(json.dumps(data)))
+        #logger.info("提交抢购订单所需参数: {}".format(json.dumps(data)))
         return data
 
     def submit_seckill_order(self):
